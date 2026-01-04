@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Health Dashboard | Vehicle Maintenance Monitor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #1a2530);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 2.2rem;
+        }
+
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .vehicle-info {
+            display: flex;
+            gap: 20px;
+            font-size: 0.95rem;
+        }
+
+        .vehicle-info span {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .health-summary {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .health-score {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+
+        .health-bars {
+            flex-grow: 1;
+        }
+
+        .health-bar {
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .health-bar.good {
+            background-color: var(--success-color);
+        }
+
+        .health-bar.warning {
+            background-color: var(--warning-color);
+        }
+
+        .health-bar.critical {
+            background-color: var(--danger-color);
+        }
+
+        .alert-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-count {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .alert-count.critical {
+            color: var(--danger-color);
+        }
+
+        .alert-count.warning {
+            color: var(--warning-color);
+        }
+
+        .alert-count.good {
+            color: var(--success-color);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-good {
+            background-color: var(--success-color);
+        }
+
+        .status-warning {
+            background-color: var(--warning-color);
+        }
+
+        .status-critical {
+            background-color: var(--danger-color);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1100px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .car-visualization {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            position: relative;
+            min-height: 500px;
+        }
+
+        .car-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .car-outline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><path d="M80,150 Q100,100 150,100 Q200,100 250,100 Q300,100 320,150 L340,200 L60,200 Z" fill="%23f0f0f0" stroke="%23333" stroke-width="2"/><circle cx="120" cy="220" r="20" fill="%23ccc"/><circle cx="280" cy="220" r="20" fill="%23ccc"/><rect x="150" y="120" width="100" height="60" rx="5" fill="%23ddd"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
+
+        .system-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        .system-dot:hover {
+            transform: scale(1.3);
+        }
+
+        .system-dot.engine {
+            top: 40%;
+            left: 25%;
+            background-color: var(--warning-color);
+        }
+
+        .system-dot.brakes {
+            top: 65%;
+            left: 30%;
+            background-color: var(--danger-color);
+        }
+
+        .system-dot.cooling {
+            top: 35%;
+            left: 35%;
+            background-color: var(--success-color);
+        }
+
+        .system-dot.electrical {
+            top: 45%;
+            left: 50%;
+            background-color: var(--success-color);
+        }
+
+        .system-dot.suspension {
+            top: 75%;
+            left: 25%;
+            background-color: var(--success-color);
+        }
+
+        .system-dot.tires {
+            top: 80%;
+            left: 20%;
+            background-color: var(--warning-color);
+        }
+
+        .system-dot.exhaust {
+            top: 65%;
+            left: 70%;
+            background-color: var(--success-color);
+        }
+
+        .system-dot.ac {
+            top: 25%;
+            left: 45%;
+            background-color: var(--success-color);
+        }
+
+        .system-dot.lights {
+            top: 30%;
+            left: 15%;
+            background-color: var(--success-color);
+        }
+
+        .system-details {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .system-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .system-tag {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .system-tag:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .system-tag.good {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+        }
+
+        .system-tag.warning {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: #d35400;
+        }
+
+        .system-tag.critical {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+            border-color: var(--danger-color);
+        }
+
+        .component-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .component-table th {
+            background-color: #f8f9fa;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+        }
+
+        .component-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .component-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .action-btn.view {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .action-btn.view:hover {
+            background-color: #2980b9;
+        }
+
+        .maintenance-section {
+            margin-top: 30px;
+        }
+
+        .maintenance-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .maintenance-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            border-left: 5px solid;
+        }
+
+        .maintenance-card.critical {
+            border-left-color: var(--danger-color);
+        }
+
+        .maintenance-card.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .maintenance-card.info {
+            border-left-color: var(--secondary-color);
+        }
+
+        .maintenance-list {
+            margin-top: 15px;
+            list-style-type: none;
+        }
+
+        .maintenance-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .maintenance-list li:last-child {
+            border-bottom: none;
+        }
+
+        .cost-badge {
+            background-color: #f8f9fa;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .vehicle-info {
+                flex-wrap: wrap;
+            }
+            
+            .health-summary {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .car-container {
+                height: 300px;
+            }
+        }
+
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+
+        .tab-btn.active {
+            color: var(--secondary-color);
+            border-bottom: 3px solid var(--secondary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+        }
+
+        .progress-fill.good {
+            background-color: var(--success-color);
+        }
+
+        .progress-fill.warning {
+            background-color: var(--warning-color);
+        }
+
+        .progress-fill.critical {
+            background-color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1><i class="fas fa-car"></i> Car Health Dashboard</h1>
+                <div class="vehicle-info">
+                    <span><i class="fas fa-car-alt"></i> Toyota Camry 2021</span>
+                    <span><i class="fas fa-tachometer-alt"></i> 48,250 miles</span>
+                    <span><i class="fas fa-calendar-alt"></i> Last Service: 2024-03-15</span>
+                </div>
+            </div>
+            <div class="health-summary">
+                <div class="health-score">85%</div>
+                <div class="health-details">
+                    <h3>Overall Vehicle Health: Good</h3>
+                    <p>Regular maintenance required. 3 systems need attention.</p>
+                    <div class="health-bars">
+                        <div class="health-bar good" style="width: 70%;"></div>
+                        <div class="health-bar warning" style="width: 20%;"></div>
+                        <div class="health-bar critical" style="width: 10%;"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="overview-cards">
+            <div class="card">
+                <h3><i class="fas fa-exclamation-triangle"></i> Alert Summary</h3>
+                <div class="alert-summary">
+                    <div class="alert-item">
+                        <div class="alert-count critical">1</div>
+                        <div>Critical System</div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-count warning">3</div>
+                        <div>Warning Systems</div>
+                    </div>
+                    <div class="alert-item">
+                        <div class="alert-count good">12</div>
+                        <div>Good Systems</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-tools"></i> Next Service</h3>
+                <p><strong>Due:</strong> 2024-09-15 (in 32 days)</p>
+                <p><strong>Estimated Cost:</strong> $300 - $500</p>
+                <p><strong>Includes:</strong> Oil change, tire rotation, brake inspection</p>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-chart-line"></i> Health Trend</h3>
+                <p>Gradual decline due to normal wear. No sudden failures detected.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill good" style="width: 85%;"></div>
+                </div>
+                <p style="margin-top: 10px; font-size: 0.9rem;">6-month trend: 92% → 85%</p>
+            </div>
+        </div>
+
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="visualization">Car Visualization</button>
+            <button class="tab-btn" data-tab="systems">System Details</button>
+            <button class="tab-btn" data-tab="maintenance">Maintenance Plan</button>
+            <button class="tab-btn" data-tab="sensors">Sensor Status</button>
+        </div>
+
+        <div class="tab-content active" id="visualization">
+            <div class="main-content">
+                <div class="car-visualization">
+                    <h2><i class="fas fa-car-side"></i> Interactive Car Health Map</h2>
+                    <p>Click on any system indicator for details</p>
+                    
+                    <div class="car-container">
+                        <div class="car-outline"></div>
+                        
+                        <!-- System Indicators -->
+                        <div class="system-dot engine" title="Engine System - Warning"></div>
+                        <div class="system-dot brakes" title="Brake System - Critical"></div>
+                        <div class="system-dot cooling" title="Cooling System - Good"></div>
+                        <div class="system-dot electrical" title="Electrical System - Good"></div>
+                        <div class="system-dot suspension" title="Suspension & Steering - Good"></div>
+                        <div class="system-dot tires" title="Wheels & Tires - Warning"></div>
+                        <div class="system-dot exhaust" title="Exhaust System - Good"></div>
+                        <div class="system-dot ac" title="AC System - Good"></div>
+                        <div class="system-dot lights" title="Lighting System - Good"></div>
+                    </div>
+                    
+                    <div class="legend" style="margin-top: 20px; display: flex; gap: 15px;">
+                        <div><span class="status-indicator status-good"></span> Good</div>
+                        <div><span class="status-indicator status-warning"></span> Warning</div>
+                        <div><span class="status-indicator status-critical"></span> Critical</div>
+                    </div>
+                </div>
+                
+                <div class="system-details">
+                    <h2><i class="fas fa-info-circle"></i> Selected System Details</h2>
+                    <div class="system-list">
+                        <div class="system-tag critical">Brake System</div>
+                        <div class="system-tag warning">Engine System</div>
+                        <div class="system-tag warning">Wheels & Tires</div>
+                        <div class="system-tag good">Cooling System</div>
+                        <div class="system-tag good">Electrical System</div>
+                        <div class="system-tag good">Suspension</div>
+                    </div>
+                    
+                    <div id="system-detail-content">
+                        <h3>Brake System <span class="status-indicator status-critical"></span> CRITICAL</h3>
+                        <table class="component-table">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Status</th>
+                                    <th>Details</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Brake Pads (Front)</td>
+                                    <td><span class="status-indicator status-critical"></span> Critical</td>
+                                    <td>2mm remaining</td>
+                                    <td><button class="action-btn view">Replace Immediately</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Brake Pads (Rear)</td>
+                                    <td><span class="status-indicator status-warning"></span> Warning</td>
+                                    <td>4mm remaining</td>
+                                    <td><button class="action-btn view">Replace in 5,000 miles</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Brake Fluid</td>
+                                    <td><span class="status-indicator status-critical"></span> Critical</td>
+                                    <td>Contamination detected</td>
+                                    <td><button class="action-btn view">Flush System</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Brake Discs</td>
+                                    <td><span class="status-indicator status-warning"></span> Warning</td>
+                                    <td>Moderate wear</td>
+                                    <td><button class="action-btn view">Resurface</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="systems">
+            <div class="card">
+                <h2><i class="fas fa-cogs"></i> All System Status</h2>
+                <div class="system-list" style="margin-bottom: 25px;">
+                    <div class="system-tag critical">Brake System</div>
+                    <div class="system-tag warning">Engine System</div>
+                    <div class="system-tag warning">Wheels & Tires</div>
+                    <div class="system-tag good">Cooling System</div>
+                    <div class="system-tag good">Electrical System</div>
+                    <div class="system-tag good">Suspension</div>
+                    <div class="system-tag good">Steering</div>
+                    <div class="system-tag good">Transmission</div>
+                    <div class="system-tag good">Fuel System</div>
+                    <div class="system-tag good">Exhaust System</div>
+                    <div class="system-tag good">AC System</div>
+                    <div class="system-tag good">Lighting</div>
+                    <div class="system-tag good">Safety Systems</div>
+                    <div class="system-tag good">Body & Interior</div>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="component-table">
+                        <thead>
+                            <tr>
+                                <th>System</th>
+                                <th>Status</th>
+                                <th>Key Components</th>
+                                <th>Maintenance Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Engine System</strong></td>
+                                <td><span class="status-indicator status-warning"></span> Warning</td>
+                                <td>Engine Oil (15% life), Spark Plugs (45k miles)</td>
+                                <td>Oil change due in 500 miles</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Brake System</strong></td>
+                                <td><span class="status-indicator status-critical"></span> Critical</td>
+                                <td>Brake Pads (2mm), Fluid (contaminated)</td>
+                                <td>Replace pads & flush fluid immediately</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Wheels & Tires</strong></td>
+                                <td><span class="status-indicator status-warning"></span> Warning</td>
+                                <td>Front tires (4/32"), Right rear (28 psi)</td>
+                                <td>Rotate tires, check alignment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cooling System</strong></td>
+                                <td><span class="status-indicator status-good"></span> Good</td>
+                                <td>Coolant, Radiator, Water Pump</td>
+                                <td>No action needed</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Electrical System</strong></td>
+                                <td><span class="status-indicator status-good"></span> Good</td>
+                                <td>Battery (65%), Alternator, Starter</td>
+                                <td>Test battery before winter</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="maintenance">
+            <div class="maintenance-section">
+                <h2><i class="fas fa-clipboard-list"></i> Maintenance Action Plan</h2>
+                
+                <div class="maintenance-cards">
+                    <div class="maintenance-card critical">
+                        <h3><i class="fas fa-exclamation-circle"></i> Immediate Actions (Within 7 Days)</h3>
+                        <ul class="maintenance-list">
+                            <li>Replace front brake pads <span class="cost-badge">$150-$250</span></li>
+                            <li>Flush brake fluid <span class="cost-badge">$80-$120</span></li>
+                            <li>Top up tire pressure <span class="cost-badge">Free</span></li>
+                        </ul>
+                        <p style="margin-top: 15px; font-weight: 500;">Total: $230-$370</p>
+                    </div>
+                    
+                    <div class="maintenance-card warning">
+                        <h3><i class="fas fa-clock"></i> Short-Term (Within 30 Days/1,000 Miles)</h3>
+                        <ul class="maintenance-list">
+                            <li>Complete oil change <span class="cost-badge">$75-$100</span></li>
+                            <li>Inspect cooling system hoses <span class="cost-badge">$30-$50</span></li>
+                            <li>Rotate tires <span class="cost-badge">$25-$50</span></li>
+                        </ul>
+                        <p style="margin-top: 15px; font-weight: 500;">Total: $130-$200</p>
+                    </div>
+                    
+                    <div class="maintenance-card info">
+                        <h3><i class="fas fa-calendar-check"></i> Upcoming Scheduled Maintenance</h3>
+                        <ul class="maintenance-list">
+                            <li><strong>50,000-mile Service</strong> (in 5,000 miles) <span class="cost-badge">$300-$500</span></li>
+                            <li><strong>60,000-mile Service</strong> (in 15,000 miles) <span class="cost-badge">$400-$600</span></li>
+                            <li><strong>Winter Preparedness Check</strong> (Dec 1, 2024) <span class="cost-badge">$50-$100</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="sensors">
+            <div class="card">
+                <h2><i class="fas fa-microchip"></i> Sensor Status Overview</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                    <div>
+                        <h3><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Active & Normal</h3>
+                        <ul style="list-style-type: none;">
+                            <li><i class="fas fa-thermometer-half"></i> Engine Temperature: 195°F</li>
+                            <li><i class="fas fa-tachometer-alt"></i> Oil Pressure: 45 psi</li>
+                            <li><i class="fas fa-car-battery"></i> Battery Voltage: 12.4V</li>
+                            <li><i class="fas fa-filter"></i> O2 Sensors: All functioning</li>
+                            <li><i class="fas fa-exclamation-triangle"></i> ABS Sensors: Normal</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3><i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i> Issues Detected</h3>
+                        <ul style="list-style-type: none;">
+                            <li><i class="fas fa-exclamation-circle"></i> Tire Pressure: 3/4 normal, 1 low</li>
+                            <li><i class="fas fa-bolt"></i> Engine knock sensor: Occasional minor detections</li>
+                            <li><i class="fas fa-times-circle" style="color: var(--danger-color);"></i> Exhaust O2 sensor (Bank 1): Intermittent signal</li>
+                        </ul>
+                        <p style="margin-top: 15px; font-size: 0.9rem; color: var(--danger-color);">
+                            <strong>Impact:</strong> May reduce fuel efficiency by 5-10%
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Car Health Dashboard | Last Updated: 2024-08-15 14:30 | Data Source: OBD-II Sensors & Manual Inspection</p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">
+                <i class="fas fa-shield-alt"></i> This is a diagnostic tool. Always consult with a certified mechanic for vehicle repairs.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // System dot click functionality
+        document.querySelectorAll('.system-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                const systemName = dot.getAttribute('title').split(' - ')[0];
+                alert(`Showing details for: ${systemName}\n\nIn a full implementation, this would load detailed component data for the selected system.`);
+                
+                // Switch to systems tab
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                document.querySelector('.tab-btn[data-tab="systems"]').classList.add('active');
+                document.getElementById('systems').classList.add('active');
+            });
+        });
+
+        // System tag click functionality
+        document.querySelectorAll('.system-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                const systemName = tag.textContent;
+                alert(`Loading detailed component view for: ${systemName}`);
+                
+                // In a real implementation, this would filter the component table
+                // or load a detailed view for the selected system
+            });
+        });
+
+        // Action button functionality
+        document.querySelectorAll('.action-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const action = button.textContent;
+                alert(`Scheduling: ${action}\n\nThis would open a scheduling interface or add to maintenance plan in a full implementation.`);
+            });
+        });
+
+        // Simulate live updates (in a real app, this would come from an API)
+        function updateHealthScore() {
+            const scoreElement = document.querySelector('.health-score');
+            let score = parseInt(scoreElement.textContent);
+            
+            // Simulate minor fluctuation
+            const change = Math.random() > 0.5 ? 1 : -1;
+            score += change;
+            
+            // Keep within bounds
+            if (score < 80) score = 80;
+            if (score > 90) score = 90;
+            
+            scoreElement.textContent = score + '%';
+            
+            // Update color based on score
+            if (score >= 85) {
+                scoreElement.style.color = 'var(--success-color)';
+            } else if (score >= 75) {
+                scoreElement.style.color = 'var(--warning-color)';
+            } else {
+                scoreElement.style.color = 'var(--danger-color)';
+            }
+        }
+
+        // Update every 30 seconds to simulate live data
+        setInterval(updateHealthScore, 30000);
+        
+        // Initial console message
+        console.log("Car Health Dashboard loaded successfully!");
+        console.log("Overall vehicle health: 85% - Regular maintenance required");
+        console.log("Critical alerts: Brake system requires immediate attention");
+    </script>
+</body>
+</html>
